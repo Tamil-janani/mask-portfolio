@@ -3,32 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tamil | MasK OS v3.8</title>
+    <title>Tamil | MasK OS v3.5</title>
     <link rel="icon" href="https://img.icons8.com/neon/96/000000/cpu.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; background: #000; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; }
         #matrix { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.3; pointer-events: none; }
         
-        /* General Window Style */
-        .window { position: fixed; background: rgba(10, 10, 10, 0.98); border: 2px solid #00ff00; border-radius: 12px; display: none; flex-direction: column; z-index: 100; box-shadow: 0 0 30px rgba(0, 255, 0, 0.2); overflow: hidden; }
-        .win-header { background: rgba(255,255,255,0.08); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 255, 0, 0.3); }
+        /* Profile Card */
+        .profile-card { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: rgba(15, 15, 15, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 18px; padding: 30px; text-align: center; z-index: 10; pointer-events: none; }
+        .tag { background: #e94560; color: white; display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.6rem; font-weight: bold; margin-bottom: 10px; }
+        h1 { color: #00d2ff; margin: 5px 0; font-size: 1.8rem; letter-spacing: 2px; }
+
+        /* Window System */
+        .window { position: fixed; background: rgba(10, 10, 10, 0.98); border: 2px solid #00d2ff; border-radius: 12px; display: none; flex-direction: column; z-index: 100; box-shadow: 0 0 30px rgba(0, 210, 255, 0.3); overflow: hidden; }
+        .win-header { background: rgba(255,255,255,0.08); padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 210, 255, 0.3); }
         .win-content { padding: 15px; overflow-y: auto; flex-grow: 1; }
 
-        /* Attendance App Specifics */
-        #attn-window { width: 750px; height: 500px; top: 5%; left: 15%; border-color: #00d2ff; }
-        .attn-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
-        .attn-table th, .attn-table td { border: 1px solid #333; padding: 10px; text-align: center; }
-        .attn-table th { background: rgba(0, 210, 255, 0.1); color: #00d2ff; }
-        .status-p { color: #00ff00; font-weight: bold; }
-        .status-ab { color: #ff5f56; font-weight: bold; }
-        .stat-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #444; }
+        #term-window { width: 580px; height: 380px; top: 10%; left: 5%; border-color: #00ff00; }
+        #sim-window { width: 450px; height: 500px; top: 15%; right: 5%; border-color: #e94560; }
+        #file-window { width: 400px; height: 350px; top: 20%; left: 30%; border-color: #ffcc00; }
+        #exec-window { width: 450px; height: 300px; top: 25%; left: 20%; border-color: #00ff88; }
 
-        /* Profile & Taskbar */
-        .profile-card { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: rgba(15, 15, 15, 0.85); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 18px; padding: 30px; text-align: center; z-index: 10; }
-        .taskbar { height: 60px; width: 100%; background: rgba(0, 0, 0, 0.95); position: fixed; bottom: 0; left: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; border-top: 2px solid #00d2ff; z-index: 1000; }
+        /* Simulator Styles */
+        .gate-select { background: #111; color: #00d2ff; border: 1px solid #00d2ff; padding: 8px; border-radius: 5px; width: 100%; margin-bottom: 15px; outline: none; }
+        .logic-btn { padding: 10px 20px; background: transparent; border: 2px solid #00d2ff; color: #00d2ff; cursor: pointer; border-radius: 5px; font-weight: bold; width: 80px; }
+        .output-bulb { width: 60px; height: 60px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 20px auto; transition: 0.3s; border: 2px solid #555; }
+        .code-box { background: #000; border: 1px solid #333; border-radius: 8px; padding: 10px; font-family: 'Courier New', monospace; font-size: 0.75rem; color: #00ff88; white-space: pre; }
+
+        /* Execution UI */
+        .progress-bar { width: 100%; height: 10px; background: #333; border-radius: 5px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: #00ff88; width: 0%; transition: width 1s ease; }
+
+        /* Taskbar */
+        .taskbar { height: 60px; width: 100%; background: rgba(0, 0, 0, 0.95); position: fixed; bottom: 0; left: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; border-top: 2px solid #00d2ff; z-index: 1000; box-sizing: border-box; }
+        .social-center { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 25px; align-items: center; }
+        .social-icon { color: #888; font-size: 1.5rem; transition: 0.3s; text-decoration: none; }
+        .social-icon:hover { color: #00d2ff; transform: translateY(-3px); }
+        .term-icon { color: #00ff00; font-size: 1.8rem; cursor: pointer; filter: drop-shadow(0 0 5px #00ff00); }
+        .clock { color: #00d2ff; font-weight: bold; font-size: 0.9rem; }
         #term-input { background: transparent; border: none; color: #00ff00; outline: none; width: 100%; font-family: 'Courier New', monospace; }
-        .term-icon { color: #00ff00; font-size: 1.8rem; cursor: pointer; }
+        .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 15px; text-align: center; }
+        .file-item i { font-size: 2.5rem; color: #ffcc00; display: block; margin-bottom: 5px; }
+        #hidden-file { display: none; }
     </style>
 </head>
 <body>
@@ -36,57 +53,77 @@
     <canvas id="matrix"></canvas>
 
     <div class="profile-card">
-        <div style="background: #e94560; display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.6rem; font-weight: bold; margin-bottom: 10px;">VLSI DESIGNER</div>
-        <h1 style="color: #00d2ff; margin: 5px 0;">Tamil S</h1>
-        <p>Type 'attendance' in Terminal</p>
+        <div class="tag">VLSI DESIGNER</div>
+        <h1>Tamil S</h1>
+        <p>Type 'help' in Terminal</p>
     </div>
 
-    <div id="term-window" class="window" style="width: 500px; height: 350px; top: 10%; left: 5%;">
-        <div class="win-header"><span><i class="fas fa-terminal"></i> Terminal</span><i class="fas fa-times-circle" style="cursor: pointer;" onclick="closeWin('term-window')"></i></div>
+    <div id="term-window" class="window">
+        <div class="win-header">
+            <span style="color: #00ff00;"><i class="fas fa-terminal"></i> Tamil@MasK: ~</span>
+            <i class="fas fa-times-circle" style="color: #ff5f56; cursor: pointer;" onclick="closeWin('term-window')"></i>
+        </div>
         <div class="win-content" id="term-body" style="background: #000;">
             <div id="history" style="color: #00ff00; font-family: 'Courier New', monospace; font-size: 0.85rem;">
-                <p>[ SYSTEM ONLINE ] Type 'attendance' or 'help'.</p>
+                <p style="margin:0;">[ SYSTEM ONLINE ] Commands: upload, run [code], simulator, ls, clear</p>
             </div>
-            <div style="display: flex; gap: 5px; font-family: 'Courier New', monospace;">
+            <div style="display: flex; gap: 5px; font-family: 'Courier New', monospace; font-size: 0.85rem; margin-top: 5px;">
                 <span style="color:#00ff00">Tamil@MasK:~$</span>
-                <input type="text" id="term-input" autocomplete="off" onkeydown="handleCmd(event)">
+                <input type="text" id="term-input" autocomplete="off" onkeydown="handleCommand(event)">
             </div>
         </div>
     </div>
 
-    <div id="attn-window" class="window">
-        <div class="win-header" style="border-bottom-color: #00d2ff;">
-            <span style="color: #00d2ff;"><i class="fas fa-calendar-check"></i> Attendance Management - AcademyAlys v1.0</span>
-            <i class="fas fa-times-circle" style="color: #ff5f56; cursor: pointer;" onclick="closeWin('attn-window')"></i>
+    <div id="exec-window" class="window">
+        <div class="win-header">
+            <span style="color: #00ff88;"><i class="fas fa-microchip fa-spin"></i> MasK Execution Engine</span>
+            <i class="fas fa-times-circle" style="color: #ff5f56; cursor: pointer;" onclick="closeWin('exec-window')"></i>
         </div>
         <div class="win-content">
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
-                <div class="stat-card"><h2 style="color: #00ff00; margin:0;">92%</h2><p style="font-size: 0.7rem; margin:5px 0;">Average Attendance</p></div>
-                <div class="stat-card"><h2 style="color: #00d2ff; margin:0;">24</h2><p style="font-size: 0.7rem; margin:5px 0;">Total Classes</p></div>
-                <div class="stat-card"><h2 style="color: #ff5f56; margin:0;">2</h2><p style="font-size: 0.7rem; margin:5px 0;">Absents</p></div>
-            </div>
-
-            <table class="attn-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>H1</th><th>H2</th><th>H3</th><th>H4</th><th>H5</th><th>H6</th><th>H7</th><th>H8</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>2026-03-13</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-ab">AB</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-p">P</td></tr>
-                    <tr><td>2026-03-12</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-p">P</td></tr>
-                    <tr><td>2026-03-11</td><td class="status-p">P</td><td class="status-ab">AB</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-p">P</td><td class="status-p">P</td></tr>
-                </tbody>
-            </table>
+            <p id="status-text" style="color:#00ff88; margin:0;">Compiling Binary...</p>
+            <div class="progress-bar"><div id="p-bar" class="progress-fill"></div></div>
+            <div id="output-text" class="code-box" style="display:none; margin-top:10px;"></div>
         </div>
     </div>
 
+    <div id="sim-window" class="window">
+        <div class="win-header" style="border-bottom-color: #e94560;">
+            <span style="color: #e94560;"><i class="fas fa-microchip"></i> 7-Gate Simulator</span>
+            <i class="fas fa-times-circle" style="color: #ff5f56; cursor: pointer;" onclick="closeWin('sim-window')"></i>
+        </div>
+        <div class="win-content">
+            <select id="gateType" class="gate-select" onchange="updateLogic()">
+                <option value="AND">AND GATE</option>
+                <option value="OR">OR GATE</option>
+                <option value="NAND">NAND GATE</option>
+                <option value="NOR">NOR GATE</option>
+                <option value="XOR">XOR GATE</option>
+                <option value="XNOR">XNOR GATE</option>
+                <option value="NOT">NOT GATE</option>
+            </select>
+            <div style="display: flex; justify-content: center; gap: 20px;">
+                <button onclick="toggleInput('A')" id="btn-A" class="logic-btn">A: 0</button>
+                <button onclick="toggleInput('B')" id="btn-B" class="logic-btn">B: 0</button>
+            </div>
+            <div id="gate-output" class="output-bulb">OFF</div>
+            <div id="verilog-display" class="code-box">module gate(); ...</div>
+        </div>
+    </div>
+
+    <div id="file-window" class="window">
+        <div class="win-header"><span style="color: #ffcc00;"><i class="fas fa-folder-open"></i> File Manager</span><i class="fas fa-times-circle" style="color: #ff5f56; cursor: pointer;" onclick="closeWin('file-window')"></i></div>
+        <div class="win-content"><div id="file-grid" class="file-grid"></div></div>
+    </div>
+
+    <input type="file" id="hidden-file" onchange="fileUploaded(this)">
+
     <div class="taskbar">
-        <div style="color: #00d2ff; font-weight: bold;" id="clock">00:00:00</div>
-        <div style="display: flex; gap: 25px;">
+        <div class="clock" id="clock">00:00:00</div>
+        <div class="social-center">
+            <a href="https://linkedin.com/in/tamilarasan-selvam-123abc" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>
             <i class="fas fa-terminal term-icon" onclick="openWin('term-window')"></i>
-            <i class="fas fa-calendar-check" style="color: #00d2ff; font-size: 1.8rem; cursor: pointer;" onclick="openWin('attn-window')"></i>
+            <a href="https://github.com/Tamil-janani" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+            <a href="https://instagram.com/tamilarasan._23" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
         </div>
         <div style="width: 40px;"></div>
     </div>
@@ -99,25 +136,85 @@
         function draw() { ctx.fillStyle = "rgba(0, 0, 0, 0.12)"; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = "#00d2ff"; ctx.font = "18px monospace"; drops.forEach((y, i) => { const text = Math.random() > 0.5 ? "0" : "1"; ctx.fillText(text, i * 20, y * 20); if (y * 20 > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++; }); }
         setInterval(draw, 50);
 
-        function openWin(id) { document.getElementById(id).style.display = 'flex'; if(id==='term-window') document.getElementById('term-input').focus(); }
+        function openWin(id) { document.getElementById(id).style.display = 'flex'; if(id === 'term-window') document.getElementById('term-input').focus(); }
         function closeWin(id) { document.getElementById(id).style.display = 'none'; }
 
-        function handleCmd(e) {
+        let folders = []; let uploaded = [];
+        let inA = 0, inB = 0;
+
+        function handleCommand(e) {
             if(e.key === 'Enter') {
                 const input = document.getElementById('term-input');
                 const history = document.getElementById('history');
-                const cmd = input.value.trim().toLowerCase();
+                const cmdLine = input.value.trim();
+                const cmdArr = cmdLine.split(' ');
+                const cmd = cmdArr[0].toLowerCase();
                 let out = "";
 
-                if(cmd === 'attendance') { openWin('attn-window'); out = "Loading AcademyAlys Database... [OK]"; }
-                else if(cmd === 'help') out = "attendance, clear, stats, ls";
+                if(cmd === 'upload') { out = "Opening secure upload channel..."; document.getElementById('hidden-file').click(); }
+                else if(cmd === 'run') {
+                    const code = cmdArr.slice(1).join(' ');
+                    out = `Sent to MasK Compiler: ${code || 'Standard_IO'}`;
+                    runExecution(code);
+                }
+                else if(cmd === 'simulator') { openWin('sim-window'); out = "Launching Logic Simulator..."; updateLogic(); }
+                else if(cmd === 'ls') out = [...folders, ...uploaded].join('  ') || "Empty.";
+                else if(cmd === 'mkdir') { 
+                    const name = cmdArr[1] || "New_Folder"; folders.push(name); updateFileGrid(); 
+                    out = `Directory '${name}' created.`; openWin('file-window');
+                }
                 else if(cmd === 'clear') { history.innerHTML = ""; input.value = ""; return; }
+                else if(cmd === 'help') out = "upload, run [code], simulator, ls, mkdir, clear";
                 else out = `bash: command not found: ${cmd}`;
 
-                history.innerHTML += `<p style="margin:0;"><span style="color:#00ff00">Tamil@MasK:~$</span> ${cmd}</p><p style="margin:0; color:#bbb;">> ${out}</p>`;
+                history.innerHTML += `<p style="margin:0;"><span style="color:#00ff00">Tamil@MasK:~$</span> ${cmdLine}</p><p style="margin:0; color:#bbb;">> ${out}</p>`;
                 input.value = ""; history.parentElement.scrollTop = history.parentElement.scrollHeight;
             }
         }
+
+        function runExecution(code) {
+            openWin('exec-window');
+            const p = document.getElementById('p-bar'); const st = document.getElementById('status-text'); const ot = document.getElementById('output-text');
+            p.style.width = '0%'; ot.style.display = 'none'; st.innerText = "Initializing MasK Compiler...";
+            setTimeout(() => { p.style.width = '100%'; st.innerText = "Compiling... Done."; 
+                setTimeout(() => { ot.style.display = 'block'; ot.innerText = `[SUCCESS] Output: 0x00FF8\nProcess: ${code || 'Default'}\nExecution Time: 0.12ms`; }, 800);
+            }, 500);
+        }
+
+        function fileUploaded(el) { if(el.files.length) { uploaded.push(el.files[0].name); updateFileGrid(); openWin('file-window'); } }
+
+        function updateFileGrid() {
+            const grid = document.getElementById('file-grid');
+            grid.innerHTML = [...folders.map(f => `<div class="file-item"><i class="fas fa-folder"></i><p style="font-size:0.6rem">${f}</p></div>`),
+                              ...uploaded.map(f => `<div class="file-item"><i class="fas fa-file-image" style="color:#00d2ff"></i><p style="font-size:0.6rem">${f}</p></div>`)].join('');
+        }
+
+        function toggleInput(g) {
+            if(g==='A') { inA = inA?0:1; document.getElementById('btn-A').innerText=`A: ${inA}`; }
+            else { inB = inB?0:1; document.getElementById('btn-B').innerText=`B: ${inB}`; }
+            updateLogic();
+        }
+
+        function updateLogic() {
+            const type = document.getElementById('gateType').value;
+            const btnB = document.getElementById('btn-B');
+            let res = 0;
+            btnB.style.opacity = (type === 'NOT') ? '0' : '1';
+            if(type==='AND') res = inA && inB;
+            else if(type==='OR') res = inA || inB;
+            else if(type==='NAND') res = !(inA && inB);
+            else if(type==='NOR') res = !(inA || inB);
+            else if(type==='XOR') res = inA ^ inB;
+            else if(type==='XNOR') res = !(inA ^ inB);
+            else if(type==='NOT') res = !inA;
+            
+            const bulb = document.getElementById('gate-output');
+            bulb.innerText = res ? "ON" : "OFF";
+            bulb.style.backgroundColor = res ? "#00D2FF" : "#333";
+            bulb.style.boxShadow = res ? "0 0 20px #00D2FF" : "none";
+            document.getElementById('verilog-display').innerText = `module gate(); \n  assign y = ${type.toLowerCase()}(a, b);\nendmodule`;
+        }
+
         setInterval(() => { document.getElementById('clock').innerHTML = new Date().toLocaleTimeString(); }, 1000);
     </script>
 </body>
