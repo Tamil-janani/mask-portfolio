@@ -9,48 +9,40 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; background: #000; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; }
         #matrix { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.3; pointer-events: none; }
-        .profile-card { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); width: 320px; background: rgba(15, 15, 15, 0.9); backdrop-filter: blur(15px); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 18px; padding: 35px; text-align: center; z-index: 10; transition: 0.5s; }
+        .profile-card { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); width: 320px; background: rgba(15, 15, 15, 0.9); backdrop-filter: blur(15px); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 18px; padding: 35px; text-align: center; z-index: 10; }
         .tag { background: #e94560; color: white; display: inline-block; padding: 4px 15px; border-radius: 8px; font-size: 0.65rem; font-weight: bold; margin-bottom: 15px; }
         h1 { color: #00d2ff; text-shadow: 0 0 15px rgba(0, 210, 255, 0.6); margin: 5px 0; }
         
-        /* Floating Windows */
-        .window { position: fixed; background: rgba(10, 10, 10, 0.98); border: 2px solid #00d2ff; border-radius: 15px; display: none; flex-direction: column; z-index: 100; box-shadow: 0 0 40px rgba(0, 210, 255, 0.3); }
+        .window { position: fixed; background: rgba(10, 10, 10, 0.98); border: 2px solid #00d2ff; border-radius: 15px; display: none; flex-direction: column; z-index: 100; box-shadow: 0 0 40px rgba(0, 210, 255, 0.4); }
         #workspace-window { top: 5%; left: 3%; right: 3%; bottom: 85px; }
-        #terminal-window { top: 20%; left: 10%; width: 500px; height: 350px; border-color: #00ff00; box-shadow: 0 0 30px rgba(0, 255, 0, 0.2); }
+        #terminal-window { top: 20%; left: 10%; width: 500px; height: 350px; border-color: #00ff00; }
         
         .win-header { background: rgba(255,255,255,0.05); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 210, 255, 0.3); }
         .win-content { padding: 15px; overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 15px; }
-        
         .section-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(0, 210, 255, 0.15); border-radius: 12px; padding: 15px; }
         .section-title { color: #00d2ff; margin-bottom: 12px; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
         
-        /* Interactive Elements */
-        .gate-select { background: #111; color: #00d2ff; border: 1px solid #00d2ff; padding: 6px; border-radius: 5px; margin-bottom: 10px; outline: none; font-size: 0.8rem; }
+        .gate-select { background: #111; color: #00d2ff; border: 1px solid #00d2ff; padding: 6px; border-radius: 5px; margin-bottom: 10px; outline: none; }
         .logic-btn { padding: 8px 16px; background: transparent; border: 2px solid #00d2ff; color: #00d2ff; cursor: pointer; border-radius: 5px; font-weight: bold; }
         .output-bulb { width: 45px; height: 45px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000; transition: 0.3s; }
         .code-box { background: #0a0a0a; border: 1px solid #222; border-radius: 8px; padding: 12px; font-family: 'Courier New', monospace; font-size: 0.75rem; color: #00ff88; white-space: pre; }
         
-        /* Taskbar */
         .taskbar { height: 60px; width: 100%; background: rgba(0, 0, 0, 0.9); position: fixed; bottom: 0; left: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border-top: 2px solid #00d2ff; z-index: 1000; box-sizing: border-box; }
-        .chip-btn { color: #00d2ff; font-size: 2rem; cursor: pointer; transition: 0.3s; }
+        .chip-btn { color: #00d2ff; font-size: 2rem; cursor: pointer; }
         .social-center { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 25px; align-items: center; }
-        .social-icon, .term-icon { color: #888; font-size: 1.4rem; text-decoration: none; transition: 0.3s; cursor: pointer; }
+        .social-icon, .term-icon { color: #888; font-size: 1.4rem; transition: 0.3s; cursor: pointer; text-decoration: none; }
         .social-icon:hover, .term-icon:hover { color: #00d2ff; transform: translateY(-5px); }
         .term-icon { color: #00ff00; }
-        .clock { color: #00d2ff; font-weight: bold; font-size: 0.85rem; }
-
-        /* Terminal Style */
-        #term-body { height: 100%; color: #00ff00; font-family: 'Courier New', monospace; font-size: 0.85rem; overflow-y: auto; }
         #term-input { background: transparent; border: none; color: #00ff00; outline: none; width: 100%; font-family: 'Courier New', monospace; }
-        
-        @media (max-width: 600px) { #terminal-window { width: 90%; left: 5%; } }
+
+        @media (max-width: 600px) { #terminal-window { width: 90%; left: 5%; height: 300px; } }
     </style>
 </head>
 <body>
 
     <canvas id="matrix"></canvas>
 
-    <div class="profile-card" id="p-card">
+    <div class="profile-card">
         <div class="tag">VLSI DESIGNER</div>
         <h1>Tamil S</h1>
         <p>Click Chip for Workspace</p>
@@ -95,14 +87,13 @@ endmodule</div>
             <i class="fas fa-times-circle" style="color: #ff5f56; cursor: pointer;" onclick="closeWin('terminal-window')"></i>
         </div>
         <div class="win-content" style="background: rgba(0,0,0,0.95);">
-            <div id="term-body">
-                <p style="margin:0;">Welcome to MasK OS v13.0.4</p>
+            <div id="history" style="color: #00ff00; font-family: 'Courier New', monospace; font-size: 0.85rem;">
+                <p style="margin:0;">Welcome to Tamil's MasK OS v13.0.4</p>
                 <p style="margin:0; color:#888;">Type 'help' for commands.</p>
-                <div id="history"></div>
-                <div style="display: flex; gap: 5px;">
-                    <span style="color:#00ff00">Tamil@MasK:~$</span>
-                    <input type="text" id="term-input" autocomplete="off" onkeydown="handleCommand(event)">
-                </div>
+            </div>
+            <div style="display: flex; gap: 5px; font-family: 'Courier New', monospace; font-size: 0.85rem;">
+                <span style="color:#00ff00">Tamil@MasK:~$</span>
+                <input type="text" id="term-input" autocomplete="off" onkeydown="handleCommand(event)">
             </div>
         </div>
     </div>
@@ -111,7 +102,7 @@ endmodule</div>
         <i class="fas fa-microchip chip-btn" onclick="openWin('workspace-window')"></i>
         <div class="social-center">
             <a href="https://linkedin.com/in/tamilarasan-selvam-123abc" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>
-            <i class="fas fa-terminal term-icon" onclick="openWin('terminal-window')" title="Terminal"></i>
+            <i class="fas fa-terminal term-icon" onclick="openWin('terminal-window')"></i>
             <a href="https://github.com/Tamil-janani" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
             <a href="https://instagram.com/tamilarasan._23" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
         </div>
@@ -126,10 +117,7 @@ endmodule</div>
         function draw() { ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = "#00d2ff"; ctx.font = "15px monospace"; drops.forEach((y, i) => { ctx.fillText(Math.floor(Math.random()*2), i*20, y*20); if(y*20 > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++; }); }
         setInterval(draw, 50);
 
-        function openWin(id) { 
-            document.getElementById(id).style.display = 'flex';
-            if(id === 'terminal-window') setTimeout(() => document.getElementById('term-input').focus(), 100);
-        }
+        function openWin(id) { document.getElementById(id).style.display = 'flex'; if(id === 'terminal-window') setTimeout(() => document.getElementById('term-input').focus(), 100); }
         function closeWin(id) { document.getElementById(id).style.display = 'none'; }
 
         let inA = 0, inB = 0;
@@ -161,10 +149,10 @@ endmodule</div>
                 const history = document.getElementById('history');
                 const cmd = input.value.toLowerCase().trim();
                 let out = "";
-                if(cmd === 'help') out = "Available: bio, skills, contact, clear";
-                else if(cmd === 'bio') out = "Tamil S: VLSI Design Student & Logic Enthusiast.";
-                else if(cmd === 'skills') out = "Verilog, Vivado, CMOS Digital Design, FPGA.";
-                else if(cmd === 'contact') out = "Reach me at: tamilarasanselvam@email.com";
+                if(cmd === 'help') out = "Commands: bio, skills, contact, clear";
+                else if(cmd === 'bio') out = "Tamil S: VLSI Design Enthusiast.";
+                else if(cmd === 'skills') out = "Verilog, Vivado, CMOS, FPGA.";
+                else if(cmd === 'contact') out = "Email: tamilarasanselvam@email.com";
                 else if(cmd === 'clear') { history.innerHTML = ""; input.value = ""; return; }
                 else out = `Command '${cmd}' not found.`;
                 history.innerHTML += `<p style="margin:0; color:#888;">Tamil@MasK:~$ ${cmd}</p><p style="margin:0;">> ${out}</p>`;
