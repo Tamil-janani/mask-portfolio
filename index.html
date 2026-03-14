@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tamil | MasK OS Ultra</title>
+    <title>Tamil | MasK OS v3.5</title>
     <link rel="icon" href="https://img.icons8.com/neon/96/000000/cpu.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -23,7 +23,7 @@
         #term-window { width: 580px; height: 380px; top: 10%; left: 5%; border-color: #00ff00; }
         #sim-window { width: 450px; height: 500px; top: 15%; right: 5%; border-color: #e94560; }
         #file-window { width: 400px; height: 350px; top: 20%; left: 30%; border-color: #ffcc00; }
-        #app-window { width: 400px; height: 350px; top: 25%; left: 20%; border-color: #00d2ff; }
+        #exec-window { width: 450px; height: 300px; top: 25%; left: 20%; border-color: #00ff88; }
 
         /* Simulator Styles */
         .gate-select { background: #111; color: #00d2ff; border: 1px solid #00d2ff; padding: 8px; border-radius: 5px; width: 100%; margin-bottom: 15px; outline: none; }
@@ -31,7 +31,11 @@
         .output-bulb { width: 60px; height: 60px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 20px auto; transition: 0.3s; border: 2px solid #555; }
         .code-box { background: #000; border: 1px solid #333; border-radius: 8px; padding: 10px; font-family: 'Courier New', monospace; font-size: 0.75rem; color: #00ff88; white-space: pre; }
 
-        /* Taskbar & Social Icons */
+        /* Execution UI */
+        .progress-bar { width: 100%; height: 10px; background: #333; border-radius: 5px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: #00ff88; width: 0%; transition: width 1s ease; }
+
+        /* Taskbar */
         .taskbar { height: 60px; width: 100%; background: rgba(0, 0, 0, 0.95); position: fixed; bottom: 0; left: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; border-top: 2px solid #00d2ff; z-index: 1000; box-sizing: border-box; }
         .social-center { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 25px; align-items: center; }
         .social-icon { color: #888; font-size: 1.5rem; transition: 0.3s; text-decoration: none; }
@@ -41,6 +45,7 @@
         #term-input { background: transparent; border: none; color: #00ff00; outline: none; width: 100%; font-family: 'Courier New', monospace; }
         .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 15px; text-align: center; }
         .file-item i { font-size: 2.5rem; color: #ffcc00; display: block; margin-bottom: 5px; }
+        #hidden-file { display: none; }
     </style>
 </head>
 <body>
@@ -60,12 +65,24 @@
         </div>
         <div class="win-content" id="term-body" style="background: #000;">
             <div id="history" style="color: #00ff00; font-family: 'Courier New', monospace; font-size: 0.85rem;">
-                <p style="margin:0;">[ SYSTEM ONLINE ] Commands: ls, mkdir, simulator, meme, speedtest, stats, clear</p>
+                <p style="margin:0;">[ SYSTEM ONLINE ] Commands: upload, run [code], simulator, ls, clear</p>
             </div>
             <div style="display: flex; gap: 5px; font-family: 'Courier New', monospace; font-size: 0.85rem; margin-top: 5px;">
                 <span style="color:#00ff00">Tamil@MasK:~$</span>
                 <input type="text" id="term-input" autocomplete="off" onkeydown="handleCommand(event)">
             </div>
+        </div>
+    </div>
+
+    <div id="exec-window" class="window">
+        <div class="win-header">
+            <span style="color: #00ff88;"><i class="fas fa-microchip fa-spin"></i> MasK Execution Engine</span>
+            <i class="fas fa-times-circle" style="color: #ff5f56; cursor: pointer;" onclick="closeWin('exec-window')"></i>
+        </div>
+        <div class="win-content">
+            <p id="status-text" style="color:#00ff88; margin:0;">Compiling Binary...</p>
+            <div class="progress-bar"><div id="p-bar" class="progress-fill"></div></div>
+            <div id="output-text" class="code-box" style="display:none; margin-top:10px;"></div>
         </div>
     </div>
 
@@ -89,7 +106,7 @@
                 <button onclick="toggleInput('B')" id="btn-B" class="logic-btn">B: 0</button>
             </div>
             <div id="gate-output" class="output-bulb">OFF</div>
-            <div id="verilog-display" class="code-box">module logic_gate(); ...</div>
+            <div id="verilog-display" class="code-box">module gate(); ...</div>
         </div>
     </div>
 
@@ -98,10 +115,7 @@
         <div class="win-content"><div id="file-grid" class="file-grid"></div></div>
     </div>
 
-    <div id="app-window" class="window">
-        <div class="win-header"><span id="app-title">Application</span><i class="fas fa-times-circle" style="color: #ff5f56; cursor: pointer;" onclick="closeWin('app-window')"></i></div>
-        <div class="win-content" id="app-content"></div>
-    </div>
+    <input type="file" id="hidden-file" onchange="fileUploaded(this)">
 
     <div class="taskbar">
         <div class="clock" id="clock">00:00:00</div>
@@ -125,39 +139,54 @@
         function openWin(id) { document.getElementById(id).style.display = 'flex'; if(id === 'term-window') document.getElementById('term-input').focus(); }
         function closeWin(id) { document.getElementById(id).style.display = 'none'; }
 
-        let folders = [];
+        let folders = []; let uploaded = [];
         let inA = 0, inB = 0;
 
         function handleCommand(e) {
             if(e.key === 'Enter') {
                 const input = document.getElementById('term-input');
                 const history = document.getElementById('history');
-                const cmdLine = input.value.trim().split(' ');
-                const cmd = cmdLine[0].toLowerCase();
-                const arg = cmdLine.slice(1).join(' ');
+                const cmdLine = input.value.trim();
+                const cmdArr = cmdLine.split(' ');
+                const cmd = cmdArr[0].toLowerCase();
                 let out = "";
 
-                if(cmd === 'mkdir') { 
-                    if(arg) { folders.push(arg); updateFileGrid(); openWin('file-window'); out = `Directory '${arg}' created.`; }
-                    else out = "Usage: mkdir [name]";
+                if(cmd === 'upload') { out = "Opening secure upload channel..."; document.getElementById('hidden-file').click(); }
+                else if(cmd === 'run') {
+                    const code = cmdArr.slice(1).join(' ');
+                    out = `Sent to MasK Compiler: ${code || 'Standard_IO'}`;
+                    runExecution(code);
                 }
-                else if(cmd === 'ls') out = folders.length ? folders.join('  ') : "Empty directory.";
                 else if(cmd === 'simulator') { openWin('sim-window'); out = "Launching Logic Simulator..."; updateLogic(); }
-                else if(cmd === 'meme') { openApp('Meme Gen', 'Generating VLSI Memes...'); out = "Opening Meme App..."; }
-                else if(cmd === 'speedtest') { openApp('Speed Test', 'Type as fast as you can!'); out = "Opening Speed Test..."; }
-                else if(cmd === 'stats') out = `Uptime: ${Math.floor(performance.now()/1000)}s | Matrix: Active`;
-                else if(cmd === 'help') out = "mkdir, ls, simulator, meme, speedtest, stats, clear";
+                else if(cmd === 'ls') out = [...folders, ...uploaded].join('  ') || "Empty.";
+                else if(cmd === 'mkdir') { 
+                    const name = cmdArr[1] || "New_Folder"; folders.push(name); updateFileGrid(); 
+                    out = `Directory '${name}' created.`; openWin('file-window');
+                }
                 else if(cmd === 'clear') { history.innerHTML = ""; input.value = ""; return; }
+                else if(cmd === 'help') out = "upload, run [code], simulator, ls, mkdir, clear";
                 else out = `bash: command not found: ${cmd}`;
 
-                history.innerHTML += `<p style="margin:0;"><span style="color:#00ff00">Tamil@MasK:~$</span> ${input.value}</p><p style="margin:0; color:#bbb;">> ${out}</p>`;
+                history.innerHTML += `<p style="margin:0;"><span style="color:#00ff00">Tamil@MasK:~$</span> ${cmdLine}</p><p style="margin:0; color:#bbb;">> ${out}</p>`;
                 input.value = ""; history.parentElement.scrollTop = history.parentElement.scrollHeight;
             }
         }
 
+        function runExecution(code) {
+            openWin('exec-window');
+            const p = document.getElementById('p-bar'); const st = document.getElementById('status-text'); const ot = document.getElementById('output-text');
+            p.style.width = '0%'; ot.style.display = 'none'; st.innerText = "Initializing MasK Compiler...";
+            setTimeout(() => { p.style.width = '100%'; st.innerText = "Compiling... Done."; 
+                setTimeout(() => { ot.style.display = 'block'; ot.innerText = `[SUCCESS] Output: 0x00FF8\nProcess: ${code || 'Default'}\nExecution Time: 0.12ms`; }, 800);
+            }, 500);
+        }
+
+        function fileUploaded(el) { if(el.files.length) { uploaded.push(el.files[0].name); updateFileGrid(); openWin('file-window'); } }
+
         function updateFileGrid() {
             const grid = document.getElementById('file-grid');
-            grid.innerHTML = folders.map(f => `<div class="file-item"><i class="fas fa-folder"></i><p style="font-size:0.6rem">${f}</p></div>`).join('');
+            grid.innerHTML = [...folders.map(f => `<div class="file-item"><i class="fas fa-folder"></i><p style="font-size:0.6rem">${f}</p></div>`),
+                              ...uploaded.map(f => `<div class="file-item"><i class="fas fa-file-image" style="color:#00d2ff"></i><p style="font-size:0.6rem">${f}</p></div>`)].join('');
         }
 
         function toggleInput(g) {
@@ -184,12 +213,6 @@
             bulb.style.backgroundColor = res ? "#00D2FF" : "#333";
             bulb.style.boxShadow = res ? "0 0 20px #00D2FF" : "none";
             document.getElementById('verilog-display').innerText = `module gate(); \n  assign y = ${type.toLowerCase()}(a, b);\nendmodule`;
-        }
-
-        function openApp(title, text) {
-            document.getElementById('app-title').innerText = title;
-            document.getElementById('app-content').innerHTML = `<p>${text}</p>`;
-            openWin('app-window');
         }
 
         setInterval(() => { document.getElementById('clock').innerHTML = new Date().toLocaleTimeString(); }, 1000);
