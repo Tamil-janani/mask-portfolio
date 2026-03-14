@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tamil | MasK OS v2.0</title>
+    <title>Tamil | MasK OS Ultra</title>
     <link rel="icon" href="https://img.icons8.com/neon/96/000000/cpu.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; background: #000; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; }
         #matrix { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.3; pointer-events: none; }
         
+        /* Profile Card */
         .profile-card { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: rgba(15, 15, 15, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 18px; padding: 30px; text-align: center; z-index: 10; pointer-events: none; }
         .tag { background: #e94560; color: white; display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.6rem; font-weight: bold; margin-bottom: 10px; }
         h1 { color: #00d2ff; margin: 5px 0; font-size: 1.8rem; letter-spacing: 2px; }
@@ -19,21 +20,27 @@
         .win-header { background: rgba(255,255,255,0.08); padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 210, 255, 0.3); }
         .win-content { padding: 15px; overflow-y: auto; flex-grow: 1; }
 
-        #term-window { width: 600px; height: 400px; top: 15%; left: 5%; border-color: #00ff00; }
-        #file-window { width: 450px; height: 400px; top: 20%; right: 5%; border-color: #ffcc00; }
-        #app-window { width: 400px; height: 350px; top: 25%; left: 30%; border-color: #e94560; }
+        #term-window { width: 580px; height: 380px; top: 10%; left: 5%; border-color: #00ff00; }
+        #sim-window { width: 450px; height: 500px; top: 15%; right: 5%; border-color: #e94560; }
+        #file-window { width: 400px; height: 350px; top: 20%; left: 30%; border-color: #ffcc00; }
+        #app-window { width: 400px; height: 350px; top: 25%; left: 20%; border-color: #00d2ff; }
 
-        /* App UI Components */
-        .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 15px; text-align: center; }
-        .file-item i { font-size: 2.5rem; color: #ffcc00; display: block; margin-bottom: 5px; }
-        .meme-box { text-align: center; }
-        .meme-img { width: 100%; border-radius: 8px; margin-bottom: 10px; border: 1px solid #333; }
-        
-        /* Taskbar */
+        /* Simulator Styles */
+        .gate-select { background: #111; color: #00d2ff; border: 1px solid #00d2ff; padding: 8px; border-radius: 5px; width: 100%; margin-bottom: 15px; outline: none; }
+        .logic-btn { padding: 10px 20px; background: transparent; border: 2px solid #00d2ff; color: #00d2ff; cursor: pointer; border-radius: 5px; font-weight: bold; width: 80px; }
+        .output-bulb { width: 60px; height: 60px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 20px auto; transition: 0.3s; border: 2px solid #555; }
+        .code-box { background: #000; border: 1px solid #333; border-radius: 8px; padding: 10px; font-family: 'Courier New', monospace; font-size: 0.75rem; color: #00ff88; white-space: pre; }
+
+        /* Taskbar & Social Icons */
         .taskbar { height: 60px; width: 100%; background: rgba(0, 0, 0, 0.95); position: fixed; bottom: 0; left: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; border-top: 2px solid #00d2ff; z-index: 1000; box-sizing: border-box; }
+        .social-center { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 25px; align-items: center; }
+        .social-icon { color: #888; font-size: 1.5rem; transition: 0.3s; text-decoration: none; }
+        .social-icon:hover { color: #00d2ff; transform: translateY(-3px); }
         .term-icon { color: #00ff00; font-size: 1.8rem; cursor: pointer; filter: drop-shadow(0 0 5px #00ff00); }
         .clock { color: #00d2ff; font-weight: bold; font-size: 0.9rem; }
-        #term-input { background: transparent; border: none; color: #00ff00; outline: none; width: 100%; font-family: 'Courier New', monospace; font-size: 0.9rem; }
+        #term-input { background: transparent; border: none; color: #00ff00; outline: none; width: 100%; font-family: 'Courier New', monospace; }
+        .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 15px; text-align: center; }
+        .file-item i { font-size: 2.5rem; color: #ffcc00; display: block; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -53,7 +60,7 @@
         </div>
         <div class="win-content" id="term-body" style="background: #000;">
             <div id="history" style="color: #00ff00; font-family: 'Courier New', monospace; font-size: 0.85rem;">
-                <p style="margin:0;">[ SYSTEM ONLINE ] Commands: ls, mkdir, meme, speedtest, stats</p>
+                <p style="margin:0;">[ SYSTEM ONLINE ] Commands: ls, mkdir, simulator, meme, speedtest, stats, clear</p>
             </div>
             <div style="display: flex; gap: 5px; font-family: 'Courier New', monospace; font-size: 0.85rem; margin-top: 5px;">
                 <span style="color:#00ff00">Tamil@MasK:~$</span>
@@ -62,28 +69,48 @@
         </div>
     </div>
 
-    <div id="file-window" class="window">
-        <div class="win-header">
-            <span style="color: #ffcc00;"><i class="fas fa-folder-open"></i> File Manager</span>
-            <i class="fas fa-times-circle" style="color: #ff5f56; cursor: pointer;" onclick="closeWin('file-window')"></i>
+    <div id="sim-window" class="window">
+        <div class="win-header" style="border-bottom-color: #e94560;">
+            <span style="color: #e94560;"><i class="fas fa-microchip"></i> 7-Gate Simulator</span>
+            <i class="fas fa-times-circle" style="color: #ff5f56; cursor: pointer;" onclick="closeWin('sim-window')"></i>
         </div>
         <div class="win-content">
-            <div id="file-grid" class="file-grid"></div>
-            <p style="font-size: 0.7rem; color: #555; margin-top: 20px;">Local Storage Sync: Active</p>
+            <select id="gateType" class="gate-select" onchange="updateLogic()">
+                <option value="AND">AND GATE</option>
+                <option value="OR">OR GATE</option>
+                <option value="NAND">NAND GATE</option>
+                <option value="NOR">NOR GATE</option>
+                <option value="XOR">XOR GATE</option>
+                <option value="XNOR">XNOR GATE</option>
+                <option value="NOT">NOT GATE</option>
+            </select>
+            <div style="display: flex; justify-content: center; gap: 20px;">
+                <button onclick="toggleInput('A')" id="btn-A" class="logic-btn">A: 0</button>
+                <button onclick="toggleInput('B')" id="btn-B" class="logic-btn">B: 0</button>
+            </div>
+            <div id="gate-output" class="output-bulb">OFF</div>
+            <div id="verilog-display" class="code-box">module logic_gate(); ...</div>
         </div>
     </div>
 
+    <div id="file-window" class="window">
+        <div class="win-header"><span style="color: #ffcc00;"><i class="fas fa-folder-open"></i> File Manager</span><i class="fas fa-times-circle" style="color: #ff5f56; cursor: pointer;" onclick="closeWin('file-window')"></i></div>
+        <div class="win-content"><div id="file-grid" class="file-grid"></div></div>
+    </div>
+
     <div id="app-window" class="window">
-        <div class="win-header">
-            <span id="app-title">Application</span>
-            <i class="fas fa-times-circle" style="color: #ff5f56; cursor: pointer;" onclick="closeWin('app-window')"></i>
-        </div>
+        <div class="win-header"><span id="app-title">Application</span><i class="fas fa-times-circle" style="color: #ff5f56; cursor: pointer;" onclick="closeWin('app-window')"></i></div>
         <div class="win-content" id="app-content"></div>
     </div>
 
     <div class="taskbar">
         <div class="clock" id="clock">00:00:00</div>
-        <i class="fas fa-terminal term-icon" onclick="openWin('term-window')"></i>
+        <div class="social-center">
+            <a href="https://linkedin.com/in/tamilarasan-selvam-123abc" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>
+            <i class="fas fa-terminal term-icon" onclick="openWin('term-window')"></i>
+            <a href="https://github.com/Tamil-janani" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+            <a href="https://instagram.com/tamilarasan._23" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+        </div>
         <div style="width: 40px;"></div>
     </div>
 
@@ -98,7 +125,8 @@
         function openWin(id) { document.getElementById(id).style.display = 'flex'; if(id === 'term-window') document.getElementById('term-input').focus(); }
         function closeWin(id) { document.getElementById(id).style.display = 'none'; }
 
-        let folders = JSON.parse(localStorage.getItem('mask_folders')) || [];
+        let folders = [];
+        let inA = 0, inB = 0;
 
         function handleCommand(e) {
             if(e.key === 'Enter') {
@@ -109,18 +137,17 @@
                 const arg = cmdLine.slice(1).join(' ');
                 let out = "";
 
-                if(cmd === 'mkdir') {
-                    if(arg) { 
-                        folders.push(arg); localStorage.setItem('mask_folders', JSON.stringify(folders));
-                        out = `Directory '${arg}' created. Check File Manager.`; updateFileGrid(); openWin('file-window');
-                    } else out = "Usage: mkdir [folder_name]";
+                if(cmd === 'mkdir') { 
+                    if(arg) { folders.push(arg); updateFileGrid(); openWin('file-window'); out = `Directory '${arg}' created.`; }
+                    else out = "Usage: mkdir [name]";
                 }
-                else if(cmd === 'ls') out = folders.length ? folders.join('  ') : "No files/folders found.";
-                else if(cmd === 'meme') { openMemeApp(); out = "Launching Meme Generator..."; }
-                else if(cmd === 'speedtest') { openSpeedTest(); out = "Initializing Typing Test..."; }
-                else if(cmd === 'stats') out = `Active Windows: ${document.querySelectorAll('.window[style*="display: flex"]').length} | Uptime: ${Math.floor(performance.now()/1000)}s`;
+                else if(cmd === 'ls') out = folders.length ? folders.join('  ') : "Empty directory.";
+                else if(cmd === 'simulator') { openWin('sim-window'); out = "Launching Logic Simulator..."; updateLogic(); }
+                else if(cmd === 'meme') { openApp('Meme Gen', 'Generating VLSI Memes...'); out = "Opening Meme App..."; }
+                else if(cmd === 'speedtest') { openApp('Speed Test', 'Type as fast as you can!'); out = "Opening Speed Test..."; }
+                else if(cmd === 'stats') out = `Uptime: ${Math.floor(performance.now()/1000)}s | Matrix: Active`;
+                else if(cmd === 'help') out = "mkdir, ls, simulator, meme, speedtest, stats, clear";
                 else if(cmd === 'clear') { history.innerHTML = ""; input.value = ""; return; }
-                else if(cmd === 'help') out = "Available: mkdir, ls, meme, speedtest, stats, clear";
                 else out = `bash: command not found: ${cmd}`;
 
                 history.innerHTML += `<p style="margin:0;"><span style="color:#00ff00">Tamil@MasK:~$</span> ${input.value}</p><p style="margin:0; color:#bbb;">> ${out}</p>`;
@@ -133,21 +160,38 @@
             grid.innerHTML = folders.map(f => `<div class="file-item"><i class="fas fa-folder"></i><p style="font-size:0.6rem">${f}</p></div>`).join('');
         }
 
-        function openMemeApp() {
-            const content = document.getElementById('app-content');
-            document.getElementById('app-title').innerText = "Hacker Meme Gen";
-            content.innerHTML = `<div class="meme-box"><img class="meme-img" src="https://api.memegen.link/images/custom/_/linux_hacker.png?background=https://i.imgflip.com/30zz5g.jpg"><p style="font-size:0.8rem">Generating VLSI memes...</p></div>`;
+        function toggleInput(g) {
+            if(g==='A') { inA = inA?0:1; document.getElementById('btn-A').innerText=`A: ${inA}`; }
+            else { inB = inB?0:1; document.getElementById('btn-B').innerText=`B: ${inB}`; }
+            updateLogic();
+        }
+
+        function updateLogic() {
+            const type = document.getElementById('gateType').value;
+            const btnB = document.getElementById('btn-B');
+            let res = 0;
+            btnB.style.opacity = (type === 'NOT') ? '0' : '1';
+            if(type==='AND') res = inA && inB;
+            else if(type==='OR') res = inA || inB;
+            else if(type==='NAND') res = !(inA && inB);
+            else if(type==='NOR') res = !(inA || inB);
+            else if(type==='XOR') res = inA ^ inB;
+            else if(type==='XNOR') res = !(inA ^ inB);
+            else if(type==='NOT') res = !inA;
+            
+            const bulb = document.getElementById('gate-output');
+            bulb.innerText = res ? "ON" : "OFF";
+            bulb.style.backgroundColor = res ? "#00D2FF" : "#333";
+            bulb.style.boxShadow = res ? "0 0 20px #00D2FF" : "none";
+            document.getElementById('verilog-display').innerText = `module gate(); \n  assign y = ${type.toLowerCase()}(a, b);\nendmodule`;
+        }
+
+        function openApp(title, text) {
+            document.getElementById('app-title').innerText = title;
+            document.getElementById('app-content').innerHTML = `<p>${text}</p>`;
             openWin('app-window');
         }
 
-        function openSpeedTest() {
-            const content = document.getElementById('app-content');
-            document.getElementById('app-title').innerText = "Terminal Speed Test";
-            content.innerHTML = `<div style="text-align:center;"><p>Type: <b>assign y = a & b;</b></p><input type="text" style="width:100%; background:#111; color:#00ff00; border:1px solid #00ff00; padding:5px;"><p id="speed-res" style="margin-top:10px;"></p></div>`;
-            openWin('app-window');
-        }
-
-        updateFileGrid();
         setInterval(() => { document.getElementById('clock').innerHTML = new Date().toLocaleTimeString(); }, 1000);
     </script>
 </body>
